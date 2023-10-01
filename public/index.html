@@ -47,7 +47,10 @@
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
-					<span class="text-4xl text-white/80 block">{{getCurrentTime}}</span>
+					<span class="text-4xl text-white/80 block"
+						><span v-if="skipNextPrayerCalculationAndShowFajr">Tomorrow</span
+						><span v-else>{{getCurrentTime}}</span></span
+					>
 					<span class="text-sm text-white/60 block">{{gregorianDate}}</span>
 					<span class="text-xs text-sky-600 pt-1 block">Fuvahmulah City</span>
 				</div>
@@ -204,7 +207,7 @@
 							skipNextPrayerCalculationAndShowFajr.value = true;
 						}
 
-						if (skipNextPrayerCalculationAndShowFajr) {
+						if (skipNextPrayerCalculationAndShowFajr.value) {
 							return { name: "Fajr", time: todaysPrayers().Fajr };
 						}
 
@@ -212,7 +215,6 @@
 					};
 
 					const calculateTimeDifference = (currentTime, nextPrayerTime) => {
-						console.table([currentTime, nextPrayerTime]);
 						if (nextPrayerTime === "") return { hours: 0, minutes: 0 };
 						const currentTimeParts = currentTime.split(":").map(Number);
 						const nextPrayerTimeParts = nextPrayerTime.split(":").map(Number);
@@ -294,6 +296,7 @@
 						hijriDate,
 						getCurrentTime,
 						gregorianDate,
+						skipNextPrayerCalculationAndShowFajr,
 					};
 				},
 			}).mount("#app");
