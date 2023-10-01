@@ -1,0 +1,15 @@
+{
+	"name": "praytime",
+	"version": "2.0.0",
+	"description": "Praytime - Prayer times in Fuvahmulah City, Maldives",
+	"main": "index.html",
+	"scripts": {
+		"dev": "npx tailwindcss -i ./src/tailwind.css -o ./public/style.css --watch"
+	},
+	"author": "@naxeem",
+	"license": "ISC",
+	"devDependencies": {},
+	"dependencies": {
+		"tailwindcss": "^3.3.3"
+	}
+}

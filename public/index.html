@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="Islamic Prayer times in Fuvahmulah City, Maldives"
+		/>
+		<script src="./js/vue.global.min.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="./style.css" />
+		<title>Praytime - Prayer times in Fuvahmulah City, Maldives</title>
+	</head>
+	<body class="bg-gray-900">
+		<main id="app" class="font-montserrat">
+			<header class="">
+				<div class="bg-slate-950/50 p-5">
+					<div class="max-w-md mx-auto flex items-center">
+						<h1 class="grow text-slate-200 text-base font-medium">PrayTime</h1>
+						<span class="shrink-0" role="button">
+							<svg
+								class="w-5 h-5 stroke-slate-600"
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 20 20"
+							>
+								<g
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+								>
+									<path
+										d="M19 11V9a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L12 2.757V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L2.929 4.343a1 1 0 0 0 0 1.414l.536.536L2.757 8H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535L8 17.243V18a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H18a1 1 0 0 0 1-1Z"
+									/>
+									<path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+								</g>
+							</svg>
+						</span>
+					</div>
+				</div>
+				<div class="max-w-md mx-auto text-center pb-5 pt-10">
+					<span class="text-4xl text-white/80 block">{{getCurrentTime}}</span>
+					<span class="text-sm text-white/60 block">{{gregorianDate}}</span>
+					<span class="text-xs text-sky-600 pt-1 block">Fuvahmulah City</span>
+				</div>
+			</header>
+			<div class="px-4 lg:px-0">
+				<section
+					class="max-w-md mx-auto p-5 grid grid-cols-5 gap-4 bg-slate-800/80 rounded-md"
+				>
+					<div class="col-span-2 flex flex-col items-center">
+						<span class="shrink-0">
+							<svg
+								class="w-5 h-5 stroke-blue-400"
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 18 20"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8.509 5.75c0-1.493.394-2.96 1.144-4.25h-.081a8.5 8.5 0 1 0 7.356 12.746A8.5 8.5 0 0 1 8.509 5.75Z"
+								/>
+							</svg>
+						</span>
+						<span class="grow text-xs text-white/80 pt-3">Hijri Date</span>
+						<span class="shrink-0 text-xs text-white/80">{{ hijriDate }}</span>
+					</div>
+					<div class="flex flex-col items-center">
+						<span class="shrink-0">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-6 h-6 fill-yellow-400"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M23 16a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h20a1 1 0 0 1 1 1Zm-5 5a1 1 0 0 0 0-2H6a1 1 0 0 0 0 2ZM7 12a1 1 0 0 0 2 0 3 3 0 0 1 6 0 1 1 0 0 0 2 0 5 5 0 0 0-10 0Zm4-7a1 1 0 0 0 2 0V4a1 1 0 0 0-2 0Zm7 7a1 1 0 0 0 1 1h1a1 1 0 0 0 0-2h-1a1 1 0 0 0-1 1ZM4 11a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm1.636-5.364a1 1 0 0 0 0 1.414l.707.707a1 1 0 0 0 1.414-1.414l-.707-.707a1 1 0 0 0-1.414 0Zm11.314 0-.707.707a1 1 0 1 0 1.414 1.414l.707-.707a1 1 0 1 0-1.414-1.414Z"
+								/>
+							</svg>
+						</span>
+						<span class="grow text-xs text-white/80 pt-3">Sunrise</span>
+						<span class="shrink-0 text-xs text-white/80"
+							>{{ todaysPrayers().Sunrise }}</span
+						>
+					</div>
+					<div class="col-span-2 flex flex-col items-center">
+						<span class="shrink-0">
+							<svg
+								class="w-5 h-5 stroke-orange-400"
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 20 20"
+							>
+								<path
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 6v4l3.276 3.276M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+								/>
+							</svg>
+						</span>
+						<span class="grow text-xs text-white/80 pt-3"
+							>{{ nextPrayer().name }} in</span
+						>
+						<span class="shrink-0 text-xs text-white/80"
+							><span v-if="timeDifference.hours !== 0"
+								>{{ timeDifference.hours }}hr</span
+							>
+							{{ timeDifference.minutes }}min</span
+						>
+					</div>
+				</section>
+			</div>
+			<section class="max-w-md mx-auto p-5 space-y-6">
+				<template
+					v-for="(value, key) in todaysPrayers()"
+					:key="`Prayer-${key}`"
+				>
+					<SalahItem
+						v-if="key !== 'Sunrise'"
+						:prayer-name="key"
+						:prayer-time="value"
+						:next-prayer="nextPrayer()"
+					/>
+				</template>
+			</section>
+		</main>
+
+		<script type="module">
+			const { createApp, ref } = Vue;
+			import SalahItem from "/js/salahItem.js";
+			import prayertimes from "/js/prayerTimes.js";
+
+			createApp({
+				components: {
+					salahitem: SalahItem,
+				},
+				setup() {
+					const skipNextPrayerCalculationAndShowFajr = ref(false);
+					const todayDate = ref(new Date());
+					const dayOfYear = (date) =>
+						Math.floor(
+							(date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
+						);
+					const todayNumber = dayOfYear(todayDate.value);
+
+					const getFormattedTime = (totalMinutes) => {
+						const hours = Math.floor(totalMinutes / 60);
+						const minutes = totalMinutes % 60;
+						return `${String(hours).padStart(2, "0")}:${String(
+							minutes
+						).padStart(2, "0")}`;
+					};
+
+					const todaysPrayers = () => {
+						const prayerTimes = prayertimes[todayNumber];
+
+						return Object.keys(prayerTimes).reduce((convertedTimes, prayer) => {
+							convertedTimes[prayer] = getFormattedTime(
+								parseInt(prayerTimes[prayer])
+							);
+							return convertedTimes;
+						}, {});
+					};
+
+					const formattedCurrentTime = getFormattedTime(
+						todayDate.value.getHours() * 60 + todayDate.value.getMinutes()
+					);
+
+					const nextPrayer = () => {
+						const currentTimeMinutes =
+							todayDate.value.getHours() * 60 + todayDate.value.getMinutes();
+						const prayers = todaysPrayers();
+						const nextPrayerEntry = Object.entries(prayers)
+							.filter(([, prayerTime]) => prayerTime > formattedCurrentTime)
+							.reduce((next, [prayerName, prayerTime]) => {
+								const timeDiff =
+									parseInt(prayerTime.split(":")[0]) * 60 +
+									parseInt(prayerTime.split(":")[1]) -
+									currentTimeMinutes;
+								if (next === null || timeDiff < next.timeDiff) {
+									return { name: prayerName, time: prayerTime, timeDiff };
+								}
+								return next;
+							}, null);
+
+						if (
+							nextPrayerEntry === null &&
+							!skipNextPrayerCalculationAndShowFajr.value
+						) {
+							const tomorrowDate = new Date();
+							tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+							todayDate.value = tomorrowDate;
+							skipNextPrayerCalculationAndShowFajr.value = true;
+						}
+
+						if (skipNextPrayerCalculationAndShowFajr) {
+							return { name: "Fajr", time: todaysPrayers().Fajr };
+						}
+
+						return nextPrayerEntry ? nextPrayerEntry : { name: "", time: "" };
+					};
+
+					const calculateTimeDifference = (currentTime, nextPrayerTime) => {
+						console.table([currentTime, nextPrayerTime]);
+						if (nextPrayerTime === "") return { hours: 0, minutes: 0 };
+						const currentTimeParts = currentTime.split(":").map(Number);
+						const nextPrayerTimeParts = nextPrayerTime.split(":").map(Number);
+
+						let hours = nextPrayerTimeParts[0] - currentTimeParts[0];
+						let minutes = nextPrayerTimeParts[1] - currentTimeParts[1];
+
+						if (minutes < 0) {
+							hours -= 1;
+							minutes += 60;
+						}
+
+						// Check if the next prayer is for the next day
+						if (hours < 0) {
+							hours += 24; // Assuming a day has 24 hours
+						}
+
+						return { hours, minutes };
+					};
+
+					const timeDifference = ref(
+						calculateTimeDifference(formattedCurrentTime, nextPrayer().time)
+					);
+
+					const makeCurrentTimeString = () => {
+						const currentHours = todayDate.value
+							.getHours()
+							.toString()
+							.padStart(2, "0");
+						const currentMinutes = todayDate.value
+							.getMinutes()
+							.toString()
+							.padStart(2, "0");
+						return `${currentHours}:${currentMinutes}`;
+					};
+
+					const getCurrentTime = ref(makeCurrentTimeString());
+
+					const countdownInterval = setInterval(() => {
+						timeDifference.value.minutes -= 1;
+
+						if (timeDifference.value.minutes < 0) {
+							timeDifference.value.hours -= 1;
+							timeDifference.value.minutes += 60;
+						}
+
+						if (
+							timeDifference.value.hours === 0 &&
+							timeDifference.value.minutes === 0
+						) {
+							clearInterval(countdownInterval);
+							// console.log(`It's time for ${nextPrayer().name}!`);
+						} else {
+							// console.log(
+							// 	`Time left for ${nextPrayer().name}: ${timeDifference.value.hours} hours and ${timeDifference.value.minutes} minutes`
+							// );
+						}
+
+						getCurrentTime.value = makeCurrentTimeString();
+					}, 60000); // Update every 1 minute (60000 milliseconds)
+
+					const hijriDate = new Intl.DateTimeFormat("en-TN-u-ca-islamic", {
+						day: "numeric",
+						month: "long",
+						year: "numeric",
+					}).format(todayDate.value);
+
+					const gregorianDate = new Intl.DateTimeFormat("en-US", {
+						weekday: "short",
+						month: "short",
+						day: "2-digit",
+						year: "numeric",
+					}).format(todayDate.value);
+
+					return {
+						todaysPrayers,
+						nextPrayer,
+						timeDifference,
+						hijriDate,
+						getCurrentTime,
+						gregorianDate,
+					};
+				},
+			}).mount("#app");
+		</script>
+	</body>
+</html>
