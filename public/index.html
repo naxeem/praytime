@@ -222,7 +222,7 @@
 							"island",
 							JSON.stringify({
 								categoryId: "81",
-								island: "Fuvahmulah",
+								island: "Fuvahmulah City",
 								atoll: "Gnaviyani",
 							})
 						);
@@ -366,18 +366,21 @@
 						getCurrentTime.value = makeCurrentTimeString();
 					}, 60000); // Update every 1 minute (60000 milliseconds)
 
-					const hijriDate = new Intl.DateTimeFormat("en-TN-u-ca-islamic", {
-						day: "numeric",
-						month: "long",
-						year: "numeric",
-					}).format(todayDate.value);
+					const hijriDate = new Intl.DateTimeFormat(
+						"en-MV-u-ca-islamic-umalqura",
+						{
+							day: "numeric",
+							month: "long",
+							year: "numeric",
+						}
+					).format(todayDate.value.getTime());
 
-					const gregorianDate = new Intl.DateTimeFormat("en-US", {
+					const gregorianDate = new Intl.DateTimeFormat("en-MV", {
 						weekday: "short",
 						month: "short",
 						day: "2-digit",
 						year: "numeric",
-					}).format(todayDate.value);
+					}).format(todayDate.value.getTime());
 
 					const handleSettingsClick = () => {
 						showSettings.value = !showSettings.value;
