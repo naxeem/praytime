@@ -151,7 +151,7 @@
 						</span>
 						<span class="grow text-xs text-white/80 pt-3">Sunrise</span>
 						<span class="shrink-0 text-xs text-white/80"
-							>{{ todaysPrayers().Sunrise }}</span
+							>{{ todaysPrayers.s }}</span
 						>
 					</div>
 					<div class="col-span-2 flex flex-col items-center">
@@ -171,7 +171,7 @@
 							</svg>
 						</span>
 						<span class="grow text-xs text-white/80 pt-3"
-							>{{ nextPrayer().name }} in</span
+							>{{ prayerNameRef[nextPrayer().name] }} in</span
 						>
 						<span class="shrink-0 text-xs text-white/80"
 							><span v-if="timeDifference.hours !== 0"
@@ -183,11 +183,11 @@
 				</section>
 				<section class="max-w-md mx-auto p-5 space-y-6 bg-slate-900 rounded-md">
 					<template
-						v-for="(value, key) in todaysPrayers()"
+						v-for="(value, key) in todaysPrayers"
 						:key="`Prayer-${key}`"
 					>
 						<SalahItem
-							v-if="key !== 'Sunrise'"
+							v-if="key !== 's'"
 							:prayer-name="key"
 							:prayer-time="value"
 							:next-prayer="nextPrayer()"
@@ -230,23 +230,10 @@
 						);
 					}
 
-					const loadIslandData = () => {
-						const loadIsland = JSON.parse(localStorage.getItem("island"));
-
-						selectedIsland.value = loadIsland.island;
-
-						categoryId.value = loadIsland.categoryId;
-						filteredPrayersByIsland.value = prayerDB.filter(
-							(item) => Number(item.CategoryId) === Number(categoryId.value)
-						);
-					};
-
+					const filteredPrayersByIsland = ref([]);
 					const selectedIsland = ref("");
 					const categoryId = ref("");
-					const filteredPrayersByIsland = ref([]);
-
-					loadIslandData();
-
+					const todaysPrayers = ref([]);
 					const skipNextPrayerCalculationAndShowFajr = ref(false);
 					const showSettings = ref(false);
 					const todayDate = ref(new Date());
@@ -256,34 +243,31 @@
 						);
 					const todayNumber = dayOfYear(todayDate.value);
 
-					const getFormattedTime = (totalMinutes) => {
-						const hours = Math.floor(totalMinutes / 60);
-						const minutes = totalMinutes % 60;
-						return `${String(hours).padStart(2, "0")}:${String(
-							minutes
-						).padStart(2, "0")}`;
+					const loadIslandData = () => {
+						const loadIsland = JSON.parse(localStorage.getItem("island"));
+
+						selectedIsland.value = loadIsland.island;
+
+						categoryId.value = loadIsland.categoryId;
+						filteredPrayersByIsland.value = prayerDB.filter(
+							(item) => Number(item.cat) === Number(categoryId.value)
+						);
+
+						todaysPrayers.value =
+							filteredPrayersByIsland.value[0].prayers[todayNumber];
 					};
 
-					const todaysPrayers = () => {
-						const prayerTimes =
-							filteredPrayersByIsland.value[0].Prayers[todayNumber];
+					loadIslandData();
 
-						return Object.keys(prayerTimes).reduce((convertedTimes, prayer) => {
-							convertedTimes[prayer] = getFormattedTime(
-								parseInt(prayerTimes[prayer])
-							);
-							return convertedTimes;
-						}, {});
-					};
-
-					const formattedCurrentTime = getFormattedTime(
-						todayDate.value.getHours() * 60 + todayDate.value.getMinutes()
-					);
+					const formattedCurrentTime = todayDate.value.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					});
 
 					const nextPrayer = () => {
 						const currentTimeMinutes =
 							todayDate.value.getHours() * 60 + todayDate.value.getMinutes();
-						const prayers = todaysPrayers();
+						const prayers = todaysPrayers.value;
 						const nextPrayerEntry = Object.entries(prayers)
 							.filter(([, prayerTime]) => prayerTime > formattedCurrentTime)
 							.reduce((next, [prayerName, prayerTime]) => {
@@ -308,7 +292,7 @@
 						}
 
 						if (skipNextPrayerCalculationAndShowFajr.value) {
-							return { name: "Fajr", time: todaysPrayers().Fajr };
+							return { name: "f", time: todaysPrayers.value.f };
 						}
 
 						return nextPrayerEntry ? nextPrayerEntry : { name: "", time: "" };
@@ -339,19 +323,7 @@
 						calculateTimeDifference(formattedCurrentTime, nextPrayer().time)
 					);
 
-					const makeCurrentTimeString = () => {
-						const currentHours = todayDate.value
-							.getHours()
-							.toString()
-							.padStart(2, "0");
-						const currentMinutes = todayDate.value
-							.getMinutes()
-							.toString()
-							.padStart(2, "0");
-						return `${currentHours}:${currentMinutes}`;
-					};
-
-					const getCurrentTime = ref(makeCurrentTimeString());
+					const getCurrentTime = ref(formattedCurrentTime);
 
 					const countdownInterval = setInterval(() => {
 						timeDifference.value.minutes -= 1;
@@ -366,14 +338,7 @@
 							timeDifference.value.minutes === 0
 						) {
 							clearInterval(countdownInterval);
-							// console.log(`It's time for ${nextPrayer().name}!`);
-						} else {
-							// console.log(
-							// 	`Time left for ${nextPrayer().name}: ${timeDifference.value.hours} hours and ${timeDifference.value.minutes} minutes`
-							// );
 						}
-
-						getCurrentTime.value = makeCurrentTimeString();
 					}, 60000); // Update every 1 minute (60000 milliseconds)
 
 					const hijriDate = new Intl.DateTimeFormat(
@@ -399,6 +364,14 @@
 						showSettings.value = !showSettings.value;
 					};
 
+					const prayerNameRef = {
+						f: "Fajr",
+						d: "Dhuhr",
+						a: "Asr",
+						m: "Maghrib",
+						i: "Isha",
+					};
+
 					return {
 						todaysPrayers,
 						nextPrayer,
@@ -410,6 +383,7 @@
 						showSettings,
 						handleSettingsClick,
 						selectedIsland,
+						prayerNameRef,
 					};
 				},
 			}).mount("#app");
