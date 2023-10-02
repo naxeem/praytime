@@ -1,4 +1,4 @@
-const version = "0.4-new";
+const version = "0.4-islands";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(
@@ -7,8 +7,10 @@ self.addEventListener("install", (e) => {
 				.addAll([
 					`./`,
 					`./index.html`,
-					`./js/prayerTimes.js`,
+					`./js/islandsList.js`,
+					`./js/prayerDB.js`,
 					`./js/salahItem.js`,
+					`./js/settings.js`,
 					`./js/vue.global.min.js`,
 					`./style.css`,
 					`./bg_pattern.svg`,

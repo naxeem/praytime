@@ -29,10 +29,7 @@
 		/>
 		<link rel="icon" type="image/png" href="./favicon.png" sizes="32x32" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta
-			name="description"
-			content="Islamic Prayer times in Fuvahmulah City, Maldives"
-		/>
+		<meta name="description" content="Islamic Prayer times in Maldives" />
 		<script src="./js/vue.global.min.js"></script>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -41,7 +38,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="./style.css" />
-		<title>Praytime - Prayer times in Fuvahmulah City, Maldives</title>
+		<title>Praytime - Prayer times in Maldives</title>
 		<script>
 			if ("serviceWorker" in navigator) {
 				window.addEventListener("load", () => {
@@ -65,8 +62,9 @@
 						<h1 class="grow text-slate-200/90 text-base font-medium">
 							PrayTime
 						</h1>
-						<span class="shrink-0 hidden" role="button">
+						<span class="shrink-0" role="button" @click="handleSettingsClick">
 							<svg
+								v-if="!showSettings"
 								class="w-5 h-5 stroke-slate-600"
 								aria-hidden="true"
 								xmlns="http://www.w3.org/2000/svg"
@@ -84,6 +82,21 @@
 									<path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
 								</g>
 							</svg>
+							<svg
+								v-else
+								class="w-5 h-5 stroke-slate-600"
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 20 20"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="m13 7-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+								/>
+							</svg>
 						</span>
 					</div>
 				</div>
@@ -93,7 +106,9 @@
 						><span v-else>{{getCurrentTime}}</span></span
 					>
 					<span class="text-sm text-white/60 block">{{gregorianDate}}</span>
-					<span class="text-xs text-sky-600 pt-1 block">Fuvahmulah City</span>
+					<span class="text-xs text-sky-600 pt-1 block"
+						>{{selectedIsland}}</span
+					>
 				</div>
 			</header>
 			<div class="px-4 lg:px-0 space-y-4">
@@ -181,19 +196,50 @@
 			<footer class="px-5 pt-3 pb-5 text-center">
 				<span class="text-xs font-normal text-slate-700">by @naxeem</span>
 			</footer>
+			<Settings v-if="showSettings" />
 		</main>
 
 		<script type="module">
 			const { createApp, ref } = Vue;
 			import SalahItem from "./js/salahItem.js";
-			import prayertimes from "./js/prayerTimes.js";
+			import Settings from "./js/settings.js";
+			import prayerDB from "./js/prayerDB.js";
 
 			createApp({
 				components: {
 					salahitem: SalahItem,
+					settings: Settings,
 				},
 				setup() {
+					// Set Settings
+					if (localStorage.getItem("atoll") === null) {
+						// If it's not set, set it to 'Gnaviyani'
+						localStorage.setItem("atoll", "Gnaviyani");
+					}
+					if (localStorage.getItem("island") === null) {
+						// If it's not set, set it to 'Gnaviyani'
+						localStorage.setItem(
+							"island",
+							JSON.stringify({
+								categoryId: "81",
+								island: "Fuvahmulah",
+								atoll: "Gnaviyani",
+							})
+						);
+					}
+
+					const loadIsland = JSON.parse(localStorage.getItem("island"));
+
+					const selectedIsland = loadIsland.island;
+
+					const categoryId = loadIsland.categoryId;
+
+					const filteredPrayersByIsland = prayerDB.filter(
+						(item) => Number(item.CategoryId) === Number(categoryId)
+					);
+
 					const skipNextPrayerCalculationAndShowFajr = ref(false);
+					const showSettings = ref(false);
 					const todayDate = ref(new Date());
 					const dayOfYear = (date) =>
 						Math.floor(
@@ -210,7 +256,7 @@
 					};
 
 					const todaysPrayers = () => {
-						const prayerTimes = prayertimes[todayNumber];
+						const prayerTimes = filteredPrayersByIsland[todayNumber];
 
 						return Object.keys(prayerTimes).reduce((convertedTimes, prayer) => {
 							convertedTimes[prayer] = getFormattedTime(
@@ -333,6 +379,10 @@
 						year: "numeric",
 					}).format(todayDate.value);
 
+					const handleSettingsClick = () => {
+						showSettings.value = !showSettings.value;
+					};
+
 					return {
 						todaysPrayers,
 						nextPrayer,
@@ -341,6 +391,9 @@
 						getCurrentTime,
 						gregorianDate,
 						skipNextPrayerCalculationAndShowFajr,
+						showSettings,
+						handleSettingsClick,
+						selectedIsland,
 					};
 				},
 			}).mount("#app");
