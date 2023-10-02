@@ -3,6 +3,31 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<link rel="manifest" href="./manifest.json" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-title" content="Praytime" />
+		<meta
+			name="description"
+			content="Simple Prayer times app for Fuvahmulah City"
+		/>
+		<meta name="theme-color" content="#38a169" />
+		<link
+			rel="apple-touch-icon"
+			sizes="144x144"
+			href="./images/icons/icon-144x144.png"
+		/>
+		<link
+			rel="apple-touch-icon"
+			sizes="152x152"
+			href="./images/icons/icon-152x152.png"
+		/>
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="./images/icons/apple-touch-icon.png"
+		/>
+		<link rel="icon" type="image/png" href="./favicon.png" sizes="32x32" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta
 			name="description"
@@ -17,6 +42,17 @@
 		/>
 		<link rel="stylesheet" href="./style.css" />
 		<title>Praytime - Prayer times in Fuvahmulah City, Maldives</title>
+		<script>
+			if ("serviceWorker" in navigator) {
+				window.addEventListener("load", () => {
+					navigator.serviceWorker
+						.register("./service-worker.js")
+						.then((reg) => {
+							console.log("Service worker registered.", reg);
+						});
+				});
+			}
+		</script>
 	</head>
 	<body
 		class="bg-gray-900"
@@ -149,8 +185,8 @@
 
 		<script type="module">
 			const { createApp, ref } = Vue;
-			import SalahItem from "/js/salahItem.js";
-			import prayertimes from "/js/prayerTimes.js";
+			import SalahItem from "./js/salahItem.js";
+			import prayertimes from "./js/prayerTimes.js";
 
 			createApp({
 				components: {
