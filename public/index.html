@@ -12,19 +12,24 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap"
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="./style.css" />
 		<title>Praytime - Prayer times in Fuvahmulah City, Maldives</title>
 	</head>
-	<body class="bg-gray-900">
-		<main id="app" class="font-montserrat">
+	<body
+		class="bg-gray-900"
+		style="background-image: url(./bg_pattern.svg); background-size: 70px"
+	>
+		<main id="app" class="font-montserrat font-normal">
 			<header class="">
-				<div class="bg-slate-950/50 p-5">
+				<div class="bg-slate-950 p-5">
 					<div class="max-w-md mx-auto flex items-center">
-						<h1 class="grow text-slate-200 text-base font-medium">PrayTime</h1>
-						<span class="shrink-0" role="button">
+						<h1 class="grow text-slate-200/90 text-base font-medium">
+							PrayTime
+						</h1>
+						<span class="shrink-0 hidden" role="button">
 							<svg
 								class="w-5 h-5 stroke-slate-600"
 								aria-hidden="true"
@@ -55,7 +60,7 @@
 					<span class="text-xs text-sky-600 pt-1 block">Fuvahmulah City</span>
 				</div>
 			</header>
-			<div class="px-4 lg:px-0">
+			<div class="px-4 lg:px-0 space-y-4">
 				<section
 					class="max-w-md mx-auto p-5 grid grid-cols-5 gap-4 bg-slate-800/80 rounded-md"
 				>
@@ -123,20 +128,23 @@
 						>
 					</div>
 				</section>
+				<section class="max-w-md mx-auto p-5 space-y-6 bg-slate-900 rounded-md">
+					<template
+						v-for="(value, key) in todaysPrayers()"
+						:key="`Prayer-${key}`"
+					>
+						<SalahItem
+							v-if="key !== 'Sunrise'"
+							:prayer-name="key"
+							:prayer-time="value"
+							:next-prayer="nextPrayer()"
+						/>
+					</template>
+				</section>
 			</div>
-			<section class="max-w-md mx-auto p-5 space-y-6">
-				<template
-					v-for="(value, key) in todaysPrayers()"
-					:key="`Prayer-${key}`"
-				>
-					<SalahItem
-						v-if="key !== 'Sunrise'"
-						:prayer-name="key"
-						:prayer-time="value"
-						:next-prayer="nextPrayer()"
-					/>
-				</template>
-			</section>
+			<footer class="px-5 pt-3 pb-5 text-center">
+				<span class="text-xs font-normal text-slate-700">by @naxeem</span>
+			</footer>
 		</main>
 
 		<script type="module">
