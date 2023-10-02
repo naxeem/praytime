@@ -133,7 +133,9 @@
 							</svg>
 						</span>
 						<span class="grow text-xs text-white/80 pt-3">Hijri Date</span>
-						<span class="shrink-0 text-xs text-white/80">{{ hijriDate }}</span>
+						<span class="shrink-0 text-xs text-white/80" style="direction: rtl"
+							>{{ hijriDate }}</span
+						>
 					</div>
 					<div class="flex flex-col items-center">
 						<span class="shrink-0">
@@ -367,7 +369,7 @@
 					}, 60000); // Update every 1 minute (60000 milliseconds)
 
 					const hijriDate = new Intl.DateTimeFormat(
-						"en-MV-u-ca-islamic-umalqura",
+						"ar-MV-u-ca-islamic-umalqura",
 						{
 							day: "numeric",
 							month: "long",

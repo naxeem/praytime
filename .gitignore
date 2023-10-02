@@ -1,6 +1,5 @@
 node_modules
 .npm
-images
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
