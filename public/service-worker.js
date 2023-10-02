@@ -1,4 +1,4 @@
-const version = "0.4-hijridate";
+const version = "0.5";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(

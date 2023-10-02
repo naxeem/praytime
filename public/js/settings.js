@@ -80,7 +80,7 @@ export default {
 			(item) => item.atoll === selectedAtoll.value
 		);
 
-		console.log("filteredIslands", filteredIslands);
+		// console.log("filteredIslands", filteredIslands);
 
 		const changeAtoll = (event) => {
 			localStorage.setItem("atoll", selectedAtoll.value);

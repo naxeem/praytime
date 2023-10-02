@@ -45,7 +45,7 @@
 					navigator.serviceWorker
 						.register("./service-worker.js")
 						.then((reg) => {
-							console.log("Service worker registered.", reg);
+							// console.log("Service worker registered.", reg);
 						});
 				});
 			}
@@ -230,15 +230,22 @@
 						);
 					}
 
-					const loadIsland = JSON.parse(localStorage.getItem("island"));
+					const loadIslandData = () => {
+						const loadIsland = JSON.parse(localStorage.getItem("island"));
 
-					const selectedIsland = loadIsland.island;
+						selectedIsland.value = loadIsland.island;
 
-					const categoryId = loadIsland.categoryId;
+						categoryId.value = loadIsland.categoryId;
+						filteredPrayersByIsland.value = prayerDB.filter(
+							(item) => Number(item.CategoryId) === Number(categoryId.value)
+						);
+					};
 
-					const filteredPrayersByIsland = prayerDB.filter(
-						(item) => Number(item.CategoryId) === Number(categoryId)
-					);
+					const selectedIsland = ref("");
+					const categoryId = ref("");
+					const filteredPrayersByIsland = ref([]);
+
+					loadIslandData();
 
 					const skipNextPrayerCalculationAndShowFajr = ref(false);
 					const showSettings = ref(false);
@@ -258,7 +265,8 @@
 					};
 
 					const todaysPrayers = () => {
-						const prayerTimes = filteredPrayersByIsland[todayNumber];
+						const prayerTimes =
+							filteredPrayersByIsland.value[0].Prayers[todayNumber];
 
 						return Object.keys(prayerTimes).reduce((convertedTimes, prayer) => {
 							convertedTimes[prayer] = getFormattedTime(
@@ -385,6 +393,9 @@
 					}).format(todayDate.value.getTime());
 
 					const handleSettingsClick = () => {
+						if (showSettings.value) {
+							loadIslandData();
+						}
 						showSettings.value = !showSettings.value;
 					};
 
