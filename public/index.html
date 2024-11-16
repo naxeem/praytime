@@ -51,53 +51,40 @@
 			}
 		</script>
 	</head>
-	<body
-		class="bg-gray-900"
-		style="background-image: url(./bg_pattern.svg); background-size: 70px"
-	>
+	<body class="bg-gradient-to-b from-blue-950 to-gray-900 h-screen">
 		<main id="app" class="font-montserrat font-normal">
 			<header class="">
-				<div class="bg-slate-950 p-5">
+				<div class="p-5">
 					<div class="max-w-md mx-auto flex items-center">
 						<h1 class="grow text-slate-200/90 text-base font-medium">
 							PrayTime
 						</h1>
-						<span class="shrink-0" role="button" @click="handleSettingsClick">
+						<button class="shrink-0" role="button" @click="handleSettingsClick">
 							<svg
 								v-if="!showSettings"
-								class="w-5 h-5 stroke-slate-600"
-								aria-hidden="true"
+								class="w-5 h-5 text-white/50"
 								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 20 20"
+								viewBox="0 0 24 24"
 							>
-								<g
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-								>
-									<path
-										d="M19 11V9a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L12 2.757V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L2.929 4.343a1 1 0 0 0 0 1.414l.536.536L2.757 8H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535L8 17.243V18a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H18a1 1 0 0 0 1-1Z"
-									/>
-									<path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-								</g>
+								<path
+									fill="currentColor"
+									d="M12 20q-.825 0-1.412-.587T10 18t.588-1.412T12 16t1.413.588T14 18t-.587 1.413T12 20m0-6q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m0-6q-.825 0-1.412-.587T10 6t.588-1.412T12 4t1.413.588T14 6t-.587 1.413T12 8"
+								/>
 							</svg>
 							<svg
 								v-else
-								class="w-5 h-5 stroke-slate-600"
-								aria-hidden="true"
+								class="w-5 h-5 text-white/50"
 								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 20 20"
+								viewBox="0 0 24 24"
 							>
 								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="m13 7-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+									fill="currentColor"
+									d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6z"
 								/>
 							</svg>
-						</span>
+
+							<span class="sr-only">Toggle Settings</span>
+						</button>
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
@@ -106,19 +93,19 @@
 						><span v-else>{{getCurrentTime}}</span></span
 					>
 					<span class="text-sm text-white/60 block">{{gregorianDate}}</span>
-					<span class="text-xs text-sky-600 pt-1 block"
+					<span class="text-xs text-orange-500 pt-1 block"
 						>{{selectedIsland}}</span
 					>
 				</div>
 			</header>
 			<div class="px-4 lg:px-0 space-y-4">
 				<section
-					class="max-w-md mx-auto p-5 grid grid-cols-5 gap-4 bg-slate-800/80 rounded-md"
+					class="max-w-md mx-auto p-5 grid grid-cols-5 gap-4 bg-gradient-to-tl from-blue-900 to-blue-600 rounded-md"
 				>
 					<div class="col-span-2 flex flex-col items-center">
 						<span class="shrink-0">
 							<svg
-								class="w-5 h-5 stroke-blue-400"
+								class="w-5 h-5 stroke-blue-200"
 								aria-hidden="true"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
@@ -181,7 +168,7 @@
 						>
 					</div>
 				</section>
-				<section class="max-w-md mx-auto p-5 space-y-6 bg-slate-900 rounded-md">
+				<section class="max-w-md mx-auto p-5 space-y-6 rounded-md">
 					<template
 						v-for="(value, key) in todaysPrayers"
 						:key="`Prayer-${key}`"

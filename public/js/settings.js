@@ -103,7 +103,7 @@ export default {
 		};
 	},
 	template: `
-  <div class="bg-slate-900 absolute z-10 top-16 right-0 bottom-0 left-0 overflow-y-scroll text-white">
+  <div class="bg-slate-900 absolute z-10 top-16 right-0 bottom-0 left-0 overflow-y-auto text-white">
     <div class="max-w-md mx-auto px-5 pt-5 space-y-4">
       <div>
         <label for="atoll" class="block mb-2 text-sm font-medium text-white">Select Atoll</label>
