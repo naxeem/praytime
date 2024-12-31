@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<link rel="manifest" href="./manifest.json" />
-		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<meta name="apple-mobile-web-app-title" content="Praytime" />
 		<meta
@@ -187,12 +187,11 @@
 			</footer>
 			<Settings v-if="showSettings" />
 		</main>
-
 		<script type="module">
 			const { createApp, ref } = Vue;
 			import SalahItem from "./js/salahItem.js";
 			import Settings from "./js/settings.js";
-			import prayerDB from "./js/prayerDB.js";
+			import { usePrayerTimes } from "./js/composables/usePrayerTimes.js";
 
 			createApp({
 				components: {
@@ -200,149 +199,19 @@
 					settings: Settings,
 				},
 				setup() {
-					// Set Settings
-					if (localStorage.getItem("atoll") === null) {
-						// If it's not set, set it to 'Gnaviyani'
-						localStorage.setItem("atoll", "Gnaviyani");
-					}
-					if (localStorage.getItem("island") === null) {
-						// If it's not set, set it to 'Gnaviyani'
-						localStorage.setItem(
-							"island",
-							JSON.stringify({
-								categoryId: "81",
-								island: "Fuvahmulah City",
-								atoll: "Gnaviyani",
-							})
-						);
-					}
-
-					const filteredPrayersByIsland = ref([]);
-					const selectedIsland = ref("");
-					const categoryId = ref("");
-					const todaysPrayers = ref([]);
-					const skipNextPrayerCalculationAndShowFajr = ref(false);
-					const showSettings = ref(false);
-					const todayDate = ref(new Date());
-					const dayOfYear = (date) =>
-						Math.floor(
-							(date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
-						);
-					const todayNumber = dayOfYear(todayDate.value);
-
-					const loadIslandData = () => {
-						const loadIsland = JSON.parse(localStorage.getItem("island"));
-
-						selectedIsland.value = loadIsland.island;
-
-						categoryId.value = loadIsland.categoryId;
-						filteredPrayersByIsland.value = prayerDB.filter(
-							(item) => Number(item.cat) === Number(categoryId.value)
-						);
-
-						todaysPrayers.value =
-							filteredPrayersByIsland.value[0].prayers[todayNumber];
-					};
-
-					loadIslandData();
-
-					const formattedCurrentTime = todayDate.value.toLocaleTimeString([], {
-						hour: "2-digit",
-						minute: "2-digit",
-					});
-
-					const nextPrayer = () => {
-						const currentTimeMinutes =
-							todayDate.value.getHours() * 60 + todayDate.value.getMinutes();
-						const prayers = todaysPrayers.value;
-						const nextPrayerEntry = Object.entries(prayers)
-							.filter(([, prayerTime]) => prayerTime > formattedCurrentTime)
-							.reduce((next, [prayerName, prayerTime]) => {
-								const timeDiff =
-									parseInt(prayerTime.split(":")[0]) * 60 +
-									parseInt(prayerTime.split(":")[1]) -
-									currentTimeMinutes;
-								if (next === null || timeDiff < next.timeDiff) {
-									return { name: prayerName, time: prayerTime, timeDiff };
-								}
-								return next;
-							}, null);
-
-						if (
-							nextPrayerEntry === null &&
-							!skipNextPrayerCalculationAndShowFajr.value
-						) {
-							const tomorrowDate = new Date();
-							tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-							todayDate.value = tomorrowDate;
-							skipNextPrayerCalculationAndShowFajr.value = true;
-						}
-
-						if (skipNextPrayerCalculationAndShowFajr.value) {
-							return { name: "f", time: todaysPrayers.value.f };
-						}
-
-						return nextPrayerEntry ? nextPrayerEntry : { name: "", time: "" };
-					};
-
-					const calculateTimeDifference = (currentTime, nextPrayerTime) => {
-						if (nextPrayerTime === "") return { hours: 0, minutes: 0 };
-						const currentTimeParts = currentTime.split(":").map(Number);
-						const nextPrayerTimeParts = nextPrayerTime.split(":").map(Number);
-
-						let hours = nextPrayerTimeParts[0] - currentTimeParts[0];
-						let minutes = nextPrayerTimeParts[1] - currentTimeParts[1];
-
-						if (minutes < 0) {
-							hours -= 1;
-							minutes += 60;
-						}
-
-						// Check if the next prayer is for the next day
-						if (hours < 0) {
-							hours += 24; // Assuming a day has 24 hours
-						}
-
-						return { hours, minutes };
-					};
-
-					const timeDifference = ref(
-						calculateTimeDifference(formattedCurrentTime, nextPrayer().time)
-					);
-
-					const getCurrentTime = ref(formattedCurrentTime);
-
-					const countdownInterval = setInterval(() => {
-						timeDifference.value.minutes -= 1;
-
-						if (timeDifference.value.minutes < 0) {
-							timeDifference.value.hours -= 1;
-							timeDifference.value.minutes += 60;
-						}
-
-						if (
-							timeDifference.value.hours === 0 &&
-							timeDifference.value.minutes === 0
-						) {
-							clearInterval(countdownInterval);
-						}
-					}, 60000); // Update every 1 minute (60000 milliseconds)
-
-					const hijriDate = new Intl.DateTimeFormat(
-						"ar-MV-u-ca-islamic-umalqura",
-						{
-							day: "numeric",
-							month: "long",
-							year: "numeric",
-						}
-					).format(todayDate.value.getTime());
-
-					const gregorianDate = new Intl.DateTimeFormat("en-MV", {
-						weekday: "short",
-						month: "short",
-						day: "2-digit",
-						year: "numeric",
-					}).format(todayDate.value.getTime());
+					const {
+						todaysPrayers,
+						selectedIsland,
+						showSettings,
+						timeDifference,
+						getCurrentTime,
+						hijriDate,
+						gregorianDate,
+						PRAYER_NAMES: prayerNameRef,
+						calculateNextPrayer: nextPrayer,
+						loadIslandData,
+						skipNextPrayerCalculationAndShowFajr,
+					} = usePrayerTimes();
 
 					const handleSettingsClick = () => {
 						if (showSettings.value) {
@@ -351,26 +220,18 @@
 						showSettings.value = !showSettings.value;
 					};
 
-					const prayerNameRef = {
-						f: "Fajr",
-						d: "Dhuhr",
-						a: "Asr",
-						m: "Maghrib",
-						i: "Isha",
-					};
-
 					return {
 						todaysPrayers,
-						nextPrayer,
-						timeDifference,
-						hijriDate,
-						getCurrentTime,
-						gregorianDate,
-						skipNextPrayerCalculationAndShowFajr,
-						showSettings,
-						handleSettingsClick,
 						selectedIsland,
+						showSettings,
+						timeDifference,
+						getCurrentTime,
+						hijriDate,
+						gregorianDate,
 						prayerNameRef,
+						nextPrayer,
+						handleSettingsClick,
+						skipNextPrayerCalculationAndShowFajr,
 					};
 				},
 			}).mount("#app");
