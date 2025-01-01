@@ -297,7 +297,7 @@
 				document.getElementById("prayerTimes").innerHTML = html;
 				document.getElementById("sunriseTime").innerHTML = dayjs(
 					prayerTimes.sunrise
-				).format("hh:mm A");
+				).format("hh:mm");
 
 				updateCountdown(nextPrayerTime);
 				setInterval(updateCountdown(nextPrayerTime), 60000);

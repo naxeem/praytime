@@ -1,4 +1,4 @@
-const version = "0.6-adan-js";
+const version = "0.7";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(
