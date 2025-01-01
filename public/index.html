@@ -7,10 +7,7 @@
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<meta name="apple-mobile-web-app-title" content="Praytime" />
-		<meta
-			name="description"
-			content="Simple Prayer times app for Fuvahmulah City"
-		/>
+		<meta name="description" content="Simple Prayer times app for the World" />
 		<meta name="theme-color" content="#020617" />
 		<link
 			rel="apple-touch-icon"
@@ -29,8 +26,12 @@
 		/>
 		<link rel="icon" type="image/png" href="./favicon.png" sizes="32x32" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="Islamic Prayer times in Maldives" />
+		<meta name="description" content="Islamic Prayer times" />
 		<script src="./js/vue.global.min.js"></script>
+		<!-- https://github.com/batoulapps/adhan-js -->
+		<script src="./js/adhan.umd.min.js"></script>
+		<script src="./js/dayjs.min.js"></script>
+		<script src="./js/duration.js"></script>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -38,7 +39,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="./style.css" />
-		<title>Praytime - Prayer times in Maldives</title>
+		<title>Praytime - Prayer times</title>
 		<script>
 			if ("serviceWorker" in navigator) {
 				window.addEventListener("load", () => {
@@ -59,9 +60,8 @@
 						<h1 class="grow text-slate-200/90 text-base font-medium">
 							PrayTime
 						</h1>
-						<button class="shrink-0" role="button" @click="handleSettingsClick">
+						<button class="shrink-0" role="button">
 							<svg
-								v-if="!showSettings"
 								class="w-5 h-5 text-white/50"
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
@@ -71,8 +71,7 @@
 									d="M12 20q-.825 0-1.412-.587T10 18t.588-1.412T12 16t1.413.588T14 18t-.587 1.413T12 20m0-6q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m0-6q-.825 0-1.412-.587T10 6t.588-1.412T12 4t1.413.588T14 6t-.587 1.413T12 8"
 								/>
 							</svg>
-							<svg
-								v-else
+							<!-- <svg
 								class="w-5 h-5 text-white/50"
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
@@ -81,21 +80,16 @@
 									fill="currentColor"
 									d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6z"
 								/>
-							</svg>
+							</svg> -->
 
 							<span class="sr-only">Toggle Settings</span>
 						</button>
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
-					<span class="text-4xl text-white/80 block"
-						><span v-if="skipNextPrayerCalculationAndShowFajr">Tomorrow</span
-						><span v-else>{{getCurrentTime}}</span></span
-					>
-					<span class="text-sm text-white/60 block">{{gregorianDate}}</span>
-					<span class="text-xs text-orange-500 pt-1 block"
-						>{{selectedIsland}}</span
-					>
+					<span class="text-4xl text-white/80 block" id="currentTime"></span>
+					<span class="text-sm text-white/60 block" id="currentDate"></span>
+					<span class="text-xs text-orange-500 pt-1 block">__________</span>
 				</div>
 			</header>
 			<div class="px-4 lg:px-0 space-y-4">
@@ -120,9 +114,7 @@
 							</svg>
 						</span>
 						<span class="grow text-xs text-white/80 pt-3">Hijri Date</span>
-						<span class="shrink-0 text-xs text-white/80" style="direction: rtl"
-							>{{ hijriDate }}</span
-						>
+						<span class="shrink-0 text-xs text-white/80" id="hijriDate"></span>
 					</div>
 					<div class="flex flex-col items-center">
 						<span class="shrink-0">
@@ -137,9 +129,10 @@
 							</svg>
 						</span>
 						<span class="grow text-xs text-white/80 pt-3">Sunrise</span>
-						<span class="shrink-0 text-xs text-white/80"
-							>{{ todaysPrayers.s }}</span
-						>
+						<span
+							class="shrink-0 text-xs text-white/80"
+							id="sunriseTime"
+						></span>
 					</div>
 					<div class="col-span-2 flex flex-col items-center">
 						<span class="shrink-0">
@@ -157,84 +150,202 @@
 								/>
 							</svg>
 						</span>
-						<span class="grow text-xs text-white/80 pt-3"
-							>{{ prayerNameRef[nextPrayer().name] }} in</span
-						>
-						<span class="shrink-0 text-xs text-white/80"
-							><span v-if="timeDifference.hours !== 0"
-								>{{ timeDifference.hours }}hr</span
-							>
-							{{ timeDifference.minutes }}min</span
-						>
+						<span
+							class="grow text-xs text-white/80 pt-3 capitalize"
+							id="nextPrayerName"
+						></span>
+						<span
+							class="shrink-0 text-xs text-white/80"
+							id="nextPrayerTime"
+						></span>
 					</div>
 				</section>
-				<section class="max-w-md mx-auto p-5 space-y-6 rounded-md">
-					<template
-						v-for="(value, key) in todaysPrayers"
-						:key="`Prayer-${key}`"
-					>
-						<SalahItem
-							v-if="key !== 's'"
-							:prayer-name="key"
-							:prayer-time="value"
-							:next-prayer="nextPrayer()"
-						/>
-					</template>
+				<section class="max-w-md mx-auto p-5 rounded-md">
+					<div id="prayerTimes" class="space-y-6"></div>
 				</section>
 			</div>
 			<footer class="px-5 pt-3 pb-5 text-center">
 				<span class="text-xs font-normal text-slate-700">by @naxeem</span>
 			</footer>
-			<Settings v-if="showSettings" />
+			<!-- <Settings v-if="showSettings" /> -->
+			<input type="hidden" id="latitude" />
+			<input type="hidden" id="longitude" />
 		</main>
-		<script type="module">
-			const { createApp, ref } = Vue;
-			import SalahItem from "./js/salahItem.js";
-			import Settings from "./js/settings.js";
-			import { usePrayerTimes } from "./js/composables/usePrayerTimes.js";
+		<script>
+			dayjs.extend(dayjs_plugin_duration);
 
-			createApp({
-				components: {
-					salahitem: SalahItem,
-					settings: Settings,
-				},
-				setup() {
-					const {
-						todaysPrayers,
-						selectedIsland,
-						showSettings,
-						timeDifference,
-						getCurrentTime,
-						hijriDate,
-						gregorianDate,
-						PRAYER_NAMES: prayerNameRef,
-						calculateNextPrayer: nextPrayer,
-						loadIslandData,
-						skipNextPrayerCalculationAndShowFajr,
-					} = usePrayerTimes();
+			const hijriDate = new Intl.DateTimeFormat("ar-MV-u-ca-islamic-umalqura", {
+				day: "numeric",
+				month: "long",
+				year: "numeric",
+			});
 
-					const handleSettingsClick = () => {
-						if (showSettings.value) {
-							loadIslandData();
+			document.getElementById("currentTime").innerHTML =
+				dayjs().format("HH:mm");
+			document.getElementById("currentDate").innerHTML =
+				dayjs().format("ddd, DD MMM YYYY");
+
+			function getHijriDate() {
+				const months = [
+					"Muharram",
+					"Safar",
+					"Rabi' al-awwal",
+					"Rabi' al-thani",
+					"Jumada al-awwal",
+					"Jumada al-thani",
+					"Rajab",
+					"Sha'ban",
+					"Ramadan",
+					"Shawwal",
+					"Dhu al-Qi'dah",
+					"Dhu al-Hijjah",
+				];
+
+				const currentDate = new Date();
+				const hijriDate = new Intl.DateTimeFormat("en-MV-u-ca-islamic", {
+					day: "numeric",
+					month: "long",
+					year: "numeric",
+				}).format(currentDate);
+
+				document.getElementById("hijriDate").innerHTML = hijriDate;
+			}
+
+			getHijriDate();
+
+			function getLocation() {
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(
+						(position) => {
+							document.getElementById("latitude").value =
+								position.coords.latitude;
+							document.getElementById("longitude").value =
+								position.coords.longitude;
+							updatePrayerTimes();
+						},
+						(error) => {
+							console.error("Error getting location:", error);
+							// Default to Mecca coordinates,
+							document.getElementById("latitude").value = -0.296608;
+							document.getElementById("longitude").value = 73.425558;
+							updatePrayerTimes();
 						}
-						showSettings.value = !showSettings.value;
-					};
+					);
+				}
+			}
 
-					return {
-						todaysPrayers,
-						selectedIsland,
-						showSettings,
-						timeDifference,
-						getCurrentTime,
-						hijriDate,
-						gregorianDate,
-						prayerNameRef,
-						nextPrayer,
-						handleSettingsClick,
-						skipNextPrayerCalculationAndShowFajr,
-					};
-				},
-			}).mount("#app");
+			function updatePrayerTimes() {
+				const latitude = parseFloat(document.getElementById("latitude").value);
+				const longitude = parseFloat(
+					document.getElementById("longitude").value
+				);
+
+				if (isNaN(latitude) || isNaN(longitude)) {
+					alert("Please enter valid coordinates");
+					return;
+				}
+
+				const coordinates = new adhan.Coordinates(latitude, longitude);
+				let params;
+
+				params = adhan.CalculationMethod.MuslimWorldLeague();
+
+				const date = new Date();
+				const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
+
+				const timeNames = {
+					fajr: "Fajr",
+					sunrise: "Sunrise",
+					dhuhr: "Dhuhr",
+					asr: "Asr",
+					maghrib: "Maghrib",
+					isha: "Isha",
+				};
+
+				const rawatibRakats = {
+					fajr: { before: 2, after: 0 },
+					dhuhr: { before: 4, after: 2 },
+					maghrib: { before: 0, after: 2 },
+					isha: { before: 0, after: 2 },
+				};
+				var next = prayerTimes.nextPrayer();
+				var nextPrayerTime = prayerTimes.timeForPrayer(next);
+
+				let html = "";
+				html += `<div>`;
+				for (const [key, name] of Object.entries(timeNames)) {
+					const time = dayjs(prayerTimes[key]).format("hh:mm A");
+					if (name !== "Sunrise") {
+						html += `<div class="flex items-center space-x-2 ${
+							next === key ? "text-orange-400" : "text-white/80"
+						}">
+								<span class="shrink-0">`;
+						if (name === "Maghrib" || name === "Isha") {
+							html += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 fill-blue-500">
+<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
+</svg>`;
+						} else {
+							html += `<svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 fill-yellow-500">
+								<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+							</svg>`;
+						}
+
+						html += `			</span>
+								<h3 class="grow text-xl font-medium">${name}</h3>
+								<span class="shrink-0 text-lg">${time}</span>
+							</div>`;
+
+						html += `<div class="flex items-center px-1 pt-1">`;
+
+						html += `<div class="grow flex items-center space-x-1">`;
+						if (rawatibRakats[key] && rawatibRakats[key].before) {
+							for (let i = 0; i < rawatibRakats[key].before; i++) {
+								html += `<span class="shrink-0 w-[2px] h-[2px] rounded-full bg-sky-600"></span>`;
+							}
+						}
+						html += `</div>`;
+
+						html += `<div class="shrink-0 flex items-center space-x-1">`;
+						if (rawatibRakats[key] && rawatibRakats[key].after) {
+							for (let i = 0; i < rawatibRakats[key].after; i++) {
+								html += `<span class="shrink-0 w-[2px] h-[2px] rounded-full bg-rose-600"></span>`;
+							}
+						}
+						html += `</div>`;
+
+						html += `</div>`;
+					}
+				}
+				html += `</div>`;
+
+				document.getElementById("prayerTimes").innerHTML = html;
+				document.getElementById("sunriseTime").innerHTML = dayjs(
+					prayerTimes.sunrise
+				).format("hh:mm A");
+
+				updateCountdown(nextPrayerTime);
+				setInterval(updateCountdown(nextPrayerTime), 60000);
+
+				document.getElementById("nextPrayerName").innerHTML = `${next} in`;
+			}
+
+			// Initialize on page loads
+			document.addEventListener("DOMContentLoaded", getLocation);
+
+			function updateCountdown(date) {
+				const now = dayjs();
+				const futureDate = dayjs(date);
+				const diff = futureDate.diff(now); // Difference in milliseconds
+
+				const duration = dayjs.duration(diff); // Convert to duration
+				const hours = Math.floor(duration.asHours());
+				const minutes = duration.minutes();
+
+				// Display the countdown
+				document.getElementById(
+					"nextPrayerTime"
+				).innerHTML = `${hours} hr ${minutes} min`;
+			}
 		</script>
 	</body>
 </html>
