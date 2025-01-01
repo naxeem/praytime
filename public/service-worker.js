@@ -1,4 +1,4 @@
-const version = "0.5";
+const version = "0.6-adan-js";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(
@@ -7,13 +7,11 @@ self.addEventListener("install", (e) => {
 				.addAll([
 					`./`,
 					`./index.html`,
-					`./js/islandsList.js`,
-					`./js/prayerDB.js`,
-					`./js/salahItem.js`,
-					`./js/settings.js`,
 					`./js/vue.global.min.js`,
+					`./js/adhan.umd.min.js`,
+					`./js/dayjs.min.js`,
+					`./js/duration.js`,
 					`./style.css`,
-					`./bg_pattern.svg`,
 				])
 				.then(() => self.skipWaiting());
 		})

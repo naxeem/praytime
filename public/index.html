@@ -60,30 +60,6 @@
 						<h1 class="grow text-slate-200/90 text-base font-medium">
 							PrayTime
 						</h1>
-						<button class="shrink-0" role="button">
-							<svg
-								class="w-5 h-5 text-white/50"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M12 20q-.825 0-1.412-.587T10 18t.588-1.412T12 16t1.413.588T14 18t-.587 1.413T12 20m0-6q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m0-6q-.825 0-1.412-.587T10 6t.588-1.412T12 4t1.413.588T14 6t-.587 1.413T12 8"
-								/>
-							</svg>
-							<!-- <svg
-								class="w-5 h-5 text-white/50"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6z"
-								/>
-							</svg> -->
-
-							<span class="sr-only">Toggle Settings</span>
-						</button>
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
@@ -272,8 +248,8 @@
 				var nextPrayerTime = prayerTimes.timeForPrayer(next);
 
 				let html = "";
-				html += `<div>`;
 				for (const [key, name] of Object.entries(timeNames)) {
+					html += `<div>`;
 					const time = dayjs(prayerTimes[key]).format("hh:mm A");
 					if (name !== "Sunrise") {
 						html += `<div class="flex items-center space-x-2 ${
@@ -315,8 +291,8 @@
 
 						html += `</div>`;
 					}
+					html += `</div>`;
 				}
-				html += `</div>`;
 
 				document.getElementById("prayerTimes").innerHTML = html;
 				document.getElementById("sunriseTime").innerHTML = dayjs(
