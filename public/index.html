@@ -63,7 +63,7 @@
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
-					<span class="text-4xl text-white/80 block" id="currentTime"></span>
+					<span class="text-4xl text-white/80 block" id="nextPrayerTime"></span>
 					<span class="text-sm text-white/60 block" id="currentDate"></span>
 					<span class="text-xs text-orange-500 pt-1 block">__________</span>
 				</div>
@@ -132,7 +132,7 @@
 						></span>
 						<span
 							class="shrink-0 text-xs text-white/80"
-							id="nextPrayerTime"
+							id="nextPrayerTimeTill"
 						></span>
 					</div>
 				</section>
@@ -156,8 +156,6 @@
 				year: "numeric",
 			});
 
-			document.getElementById("currentTime").innerHTML =
-				dayjs().format("HH:mm");
 			document.getElementById("currentDate").innerHTML =
 				dayjs().format("ddd, DD MMM YYYY");
 
@@ -247,6 +245,9 @@
 				var next = prayerTimes.nextPrayer();
 				var nextPrayerTime = prayerTimes.timeForPrayer(next);
 
+				document.getElementById("nextPrayerTime").innerHTML =
+					dayjs(nextPrayerTime).format("HH:mm");
+
 				let html = "";
 				for (const [key, name] of Object.entries(timeNames)) {
 					html += `<div>`;
@@ -319,7 +320,7 @@
 
 				// Display the countdown
 				document.getElementById(
-					"nextPrayerTime"
+					"nextPrayerTimeTill"
 				).innerHTML = `${hours} hr ${minutes} min`;
 			}
 		</script>
