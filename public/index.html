@@ -28,7 +28,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="Islamic Prayer times" />
 		<script src="./js/vue.global.min.js"></script>
-		<!-- https://github.com/batoulapps/adhan-js -->
 		<script src="./js/adhan.umd.min.js"></script>
 		<script src="./js/dayjs.min.js"></script>
 		<script src="./js/duration.js"></script>
@@ -40,32 +39,40 @@
 		/>
 		<link rel="stylesheet" href="./style.css" />
 		<title>Praytime - Prayer times</title>
-		<script>
-			if ("serviceWorker" in navigator) {
-				window.addEventListener("load", () => {
-					navigator.serviceWorker
-						.register("./service-worker.js")
-						.then((reg) => {
-							// console.log("Service worker registered.", reg);
-						});
-				});
-			}
-		</script>
 	</head>
 	<body class="bg-gradient-to-b from-blue-950 to-gray-900 h-screen">
 		<main id="app" class="font-montserrat font-normal">
-			<header class="">
+			<header>
 				<div class="p-5">
-					<div class="max-w-md mx-auto flex items-center">
-						<h1 class="grow text-slate-200/90 text-base font-medium">
+					<div class="max-w-md mx-auto flex items-center justify-between">
+						<h1 class="text-slate-200/90 grow text-base font-medium">
 							PrayTime
 						</h1>
+						<button onclick="openSettings()" class="text-slate-200/90">
+							<svg
+								class="w-5 h-5"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+							>
+								<path
+									fill="currentColor"
+									d="M12 20q-.825 0-1.412-.587T10 18t.588-1.412T12 16t1.413.588T14 18t-.587 1.413T12 20m0-6q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m0-6q-.825 0-1.412-.587T10 6t.588-1.412T12 4t1.413.588T14 6t-.587 1.413T12 8"
+								/>
+							</svg>
+						</button>
 					</div>
 				</div>
 				<div class="max-w-md mx-auto text-center pb-5 pt-10">
+					<span
+						class="block w-full p-4 max-w-xl mx-auto text-center text-red-500 text-sm"
+						id="errorMessage"
+					></span>
 					<span class="text-4xl text-white/80 block" id="nextPrayerTime"></span>
-					<span class="text-sm text-white/60 block" id="nextPrayerDate"></span>
-					<span class="text-xs text-orange-500 pt-1 block">__________</span>
+					<span class="text-sm text-white/60 block" id="currentDate"></span>
+					<span
+						class="text-xs text-orange-500 pt-1 block"
+						id="currentLocationLabel"
+					></span>
 				</div>
 			</header>
 			<div class="px-4 lg:px-0 space-y-4">
@@ -143,10 +150,100 @@
 			<footer class="px-5 pt-3 pb-5 text-center">
 				<span class="text-xs font-normal text-slate-700">by @naxeem</span>
 			</footer>
-			<!-- <Settings v-if="showSettings" /> -->
-			<input type="hidden" id="latitude" />
-			<input type="hidden" id="longitude" />
+			<!-- Settings Modal -->
+			<div
+				id="settingsModal"
+				class="hidden fixed top-0 left-0 w-full h-full overflow-y-auto bg-black/10 z-50 p-4 md:pt-20"
+			>
+				<div
+					class="space-y-5 bg-gradient-to-tr mx-auto from-blue-950 to-blue-700 rounded-xl p-5 w-full max-w-xl text-white/80"
+				>
+					<div class="flex justify-between items-center pb-3">
+						<h2 class="text-lg font-medium">Settings</h2>
+						<button onclick="closeSettings()" class="text-white/60">
+							<svg
+								class="w-5 h-5 stroke-current"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+							>
+								<path
+									fill="none"
+									stroke="currentColor"
+									stroke-dasharray="12"
+									stroke-dashoffset="12"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="m12 12 7 7m-7-7L5 5m7 7-7 7m7-7 7-7"
+								>
+									<animate
+										fill="freeze"
+										attributeName="stroke-dashoffset"
+										dur="0.3s"
+										values="12;0"
+									/>
+								</path>
+							</svg>
+							<span class="sr-only">Close Modal</span>
+						</button>
+					</div>
+					<div>
+						<label class="block text-sm mb-1" for="locationName"
+							>Location Name</label
+						>
+						<input
+							class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+							type="text"
+							id="locationName"
+							placeholder="e.g., Home, Fuvahmulah"
+						/>
+					</div>
+					<div>
+						<label class="block text-sm mb-1" for="latitude">Latitude</label>
+						<input
+							class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+							type="number"
+							step="any"
+							id="latitude"
+							placeholder="Enter latitude"
+						/>
+					</div>
+					<div>
+						<label class="block text-sm mb-1" for="longitude">Longitude</label>
+						<input
+							class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+							type="number"
+							step="any"
+							id="longitude"
+							placeholder="Enter longitude"
+						/>
+					</div>
+					<div class="flex space-x-2">
+						<button
+							onclick="getCurrentLocation()"
+							class="appearance-none rounded-xl bg-blue-950 text-sm py-3 px-5"
+						>
+							Get Current Location
+						</button>
+						<button
+							onclick="saveLocation()"
+							class="appearance-none rounded-xl bg-blue-700 text-sm py-3 px-5"
+						>
+							Save Location
+						</button>
+					</div>
+
+					<div id="savedLocations" class="mt-10 p-4">
+						<h3 class="text-lg font-medium mb-2">Saved Locations</h3>
+						<!-- Saved locations will be dynamically added here -->
+						<div id="savedLocationsList">
+							<span class="text-sm text-white/80">No locations saved yet!</span>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
+
 		<script>
 			dayjs.extend(dayjs_plugin_duration);
 
@@ -155,6 +252,9 @@
 				month: "long",
 				year: "numeric",
 			});
+
+			document.getElementById("currentDate").innerHTML =
+				dayjs().format("ddd, DD MMM YYYY");
 
 			function getHijriDate() {
 				const months = [
@@ -184,7 +284,27 @@
 
 			getHijriDate();
 
-			function getLocation() {
+			// Initialize locations from localStorage
+			let locations = JSON.parse(localStorage.getItem("savedLocations")) || [];
+			let currentLocationId = localStorage.getItem("currentLocationId");
+
+			setTimeout(() => {
+				if (!currentLocationId) {
+					document.getElementById("errorMessage").innerHTML =
+						"Error: Please set a location from settings!";
+				}
+			}, 100);
+
+			function openSettings() {
+				document.getElementById("settingsModal").style.display = "block";
+				refreshSavedLocations();
+			}
+
+			function closeSettings() {
+				document.getElementById("settingsModal").style.display = "none";
+			}
+
+			function getCurrentLocation() {
 				if (navigator.geolocation) {
 					navigator.geolocation.getCurrentPosition(
 						(position) => {
@@ -192,17 +312,98 @@
 								position.coords.latitude;
 							document.getElementById("longitude").value =
 								position.coords.longitude;
-							updatePrayerTimes();
 						},
 						(error) => {
-							console.error("Error getting location:", error);
-							// Default to Mecca coordinates,
-							document.getElementById("latitude").value = -0.296608;
-							document.getElementById("longitude").value = 73.425558;
-							updatePrayerTimes();
+							alert("Error getting location: " + error.message);
 						}
 					);
 				}
+			}
+
+			function saveLocation() {
+				const name = document.getElementById("locationName").value;
+				const lat = parseFloat(document.getElementById("latitude").value);
+				const lng = parseFloat(document.getElementById("longitude").value);
+
+				if (!name || isNaN(lat) || isNaN(lng)) {
+					alert("Please fill in all fields correctly");
+					return;
+				}
+
+				const location = {
+					id: Date.now().toString(),
+					name,
+					latitude: lat,
+					longitude: lng,
+				};
+
+				locations.push(location);
+				localStorage.setItem("savedLocations", JSON.stringify(locations));
+
+				// Set as current location
+				setCurrentLocation(location.id);
+
+				refreshSavedLocations();
+				closeSettings();
+				updatePrayerTimes();
+			}
+
+			function setCurrentLocation(locationId) {
+				currentLocationId = locationId;
+				localStorage.setItem("currentLocationId", locationId);
+				const location = locations.find((loc) => loc.id === locationId);
+				if (location) {
+					document.getElementById("latitude").value = location.latitude;
+					document.getElementById("longitude").value = location.longitude;
+					document.getElementById("locationName").value = location.name;
+
+					refreshSavedLocations();
+					updatePrayerTimes();
+				}
+			}
+
+			function deleteLocation(locationId) {
+				locations = locations.filter((loc) => loc.id !== locationId);
+				localStorage.setItem("savedLocations", JSON.stringify(locations));
+				if (currentLocationId === locationId) {
+					currentLocationId = null;
+					localStorage.removeItem("currentLocationId");
+				}
+				refreshSavedLocations();
+			}
+
+			function refreshSavedLocations() {
+				const container = document.getElementById("savedLocations");
+				const currLocation = localStorage.getItem("currentLocationId");
+
+				container.innerHTML =
+					'<h3 class="text-lg font-medium mb-2">Saved Locations</h3>';
+
+				locations.forEach((location) => {
+					const card = document.createElement("div");
+					card.className = `bg-white/10 p-4 rounded-xl mb-3 hover:bg-white/20 ${
+						currLocation === location.id ? "border border-white" : ""
+					}`;
+					card.innerHTML = `
+						<div class="flex justify-between items-center">
+							<div>
+								<div class="font-medium">${location.name}</div>
+								<div class="text-sm text-white/60">${location.latitude}, ${
+						location.longitude
+					}</div>
+							</div>
+							<div class="flex space-x-2 text-sm">
+								<button onclick="setCurrentLocation('${location.id}')" class="text-blue-300 ${
+						currLocation === location.id ? "hidden" : ""
+					}">Use</button>
+								<button onclick="deleteLocation('${
+									location.id
+								}')" class="text-red-300">Delete</button>
+							</div>
+						</div>
+					`;
+					container.appendChild(card);
+				});
 			}
 
 			function updatePrayerTimes() {
@@ -210,6 +411,14 @@
 				const longitude = parseFloat(
 					document.getElementById("longitude").value
 				);
+
+				document.getElementById("currentLocationLabel").innerHTML =
+					document.getElementById("locationName").value;
+
+				// clear error
+				if (currentLocationId) {
+					document.getElementById("errorMessage").innerHTML = "";
+				}
 
 				if (isNaN(latitude) || isNaN(longitude)) {
 					alert("Please enter valid coordinates");
@@ -244,9 +453,6 @@
 
 				document.getElementById("nextPrayerTime").innerHTML =
 					dayjs(nextPrayerTime).format("HH:mm");
-
-				document.getElementById("nextPrayerDate").innerHTML =
-					dayjs(nextPrayerTime).format("ddd, DD MMM YYYY");
 
 				let html = "";
 				for (const [key, name] of Object.entries(timeNames)) {
@@ -306,8 +512,22 @@
 				document.getElementById("nextPrayerName").innerHTML = `${next} in`;
 			}
 
-			// Initialize on page loads
-			document.addEventListener("DOMContentLoaded", getLocation);
+			// Modified initialization
+			document.addEventListener("DOMContentLoaded", () => {
+				if (currentLocationId) {
+					const location = locations.find(
+						(loc) => loc.id === currentLocationId
+					);
+					if (location) {
+						document.getElementById("latitude").value = location.latitude;
+						document.getElementById("longitude").value = location.longitude;
+						document.getElementById("locationName").value = location.name;
+						updatePrayerTimes();
+					}
+				} else {
+					getLocation(); // Fall back to getting current location
+				}
+			});
 
 			function updateCountdown(date) {
 				const now = dayjs();

@@ -1,6 +1,6 @@
 {
 	"name": "praytime",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Praytime - Prayer times in the World",
 	"main": "index.html",
 	"scripts": {

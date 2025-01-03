@@ -1,4 +1,4 @@
-const version = "0.8-nextpt";
+const version = "0.9-settings";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(
