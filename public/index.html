@@ -333,6 +333,8 @@
 					localStorage.setItem("currentCalculationMethod", "MuslimWorldLeague");
 					currentCalculationMethod = "MuslimWorldLeague";
 				}
+				document.getElementById("calculationMethod").value =
+					currentCalculationMethod;
 			}, 100);
 
 			function openSettings() {
