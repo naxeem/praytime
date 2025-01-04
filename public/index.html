@@ -188,6 +188,39 @@
 						</button>
 					</div>
 					<div>
+						<label class="block text-sm mb-1" for="calculationMethod"
+							>Calculation Method</label
+						>
+						<select
+							class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+							id="calculationMethod"
+						>
+							<option value="MuslimWorldLeague">
+								Muslim World League (MWL)
+							</option>
+							<option value="Egyptian">
+								Egyptian General Authority of Survey (Egypt)
+							</option>
+							<option value="Karachi">
+								University of Islamic Sciences, Karachi (Karachi)
+							</option>
+							<option value="UmmAlQura">
+								Umm al-Qura University, Makkah (Makkah)
+							</option>
+							<option value="Dubai">Dubai</option>
+							<option value="MoonsightingCommittee">
+								Moonsighting Committee
+							</option>
+							<option value="North America">
+								Islamic Society of North America (ISNA)
+							</option>
+							<option value="Kuwait">Kuwait</option>
+							<option value="Qatar">Qatar</option>
+							<option value="Singapore">Singapore</option>
+							<option value="Turkey">Turkey</option>
+						</select>
+					</div>
+					<div>
 						<label class="block text-sm mb-1" for="locationName"
 							>Location Name</label
 						>
@@ -287,11 +320,18 @@
 			// Initialize locations from localStorage
 			let locations = JSON.parse(localStorage.getItem("savedLocations")) || [];
 			let currentLocationId = localStorage.getItem("currentLocationId");
+			let currentCalculationMethod = localStorage.getItem(
+				"currentCalculationMethod"
+			);
 
 			setTimeout(() => {
 				if (!currentLocationId) {
 					document.getElementById("errorMessage").innerHTML =
 						"Error: Please set a location from settings!";
+				}
+				if (!currentCalculationMethod) {
+					localStorage.setItem("currentCalculationMethod", "MuslimWorldLeague");
+					currentCalculationMethod = "MuslimWorldLeague";
 				}
 			}, 100);
 
@@ -372,6 +412,25 @@
 				refreshSavedLocations();
 			}
 
+			// Define your function
+			function onCalculationMethodChange(event) {
+				const selectedCalculationMethod = event.target.value; // Get the selected value
+				console.log("Selected value:", selectedCalculationMethod);
+				localStorage.setItem(
+					"currentCalculationMethod",
+					selectedCalculationMethod
+				);
+				currentCalculationMethod = selectedCalculationMethod;
+
+				updatePrayerTimes();
+			}
+
+			// Get the select element
+			const selectElement = document.getElementById("calculationMethod");
+
+			// Add the change event listener
+			selectElement.addEventListener("change", onCalculationMethodChange);
+
 			function refreshSavedLocations() {
 				const container = document.getElementById("savedLocations");
 				const currLocation = localStorage.getItem("currentLocationId");
@@ -428,7 +487,44 @@
 				const coordinates = new adhan.Coordinates(latitude, longitude);
 				let params;
 
-				params = adhan.CalculationMethod.MuslimWorldLeague();
+				// Get the calculation method parameters
+				switch (currentCalculationMethod) {
+					case "MuslimWorldLeague":
+						params = adhan.CalculationMethod.MuslimWorldLeague();
+						break;
+					case "Egyptian":
+						params = adhan.CalculationMethod.Egyptian();
+						break;
+					case "Karachi":
+						params = adhan.CalculationMethod.Karachi();
+						break;
+					case "UmmAlQura":
+						params = adhan.CalculationMethod.UmmAlQura();
+						break;
+					case "Dubai":
+						params = adhan.CalculationMethod.Dubai();
+						break;
+					case "MoonsightingCommittee":
+						params = adhan.CalculationMethod.MoonsightingCommittee();
+						break;
+					case "NorthAmerica":
+						params = adhan.CalculationMethod.NorthAmerica();
+						break;
+					case "Kuwait":
+						params = adhan.CalculationMethod.Kuwait();
+						break;
+					case "Qatar":
+						params = adhan.CalculationMethod.Qatar();
+						break;
+					case "Singapore":
+						params = adhan.CalculationMethod.Singapore();
+						break;
+					case "Turkey":
+						params = adhan.CalculationMethod.Turkey();
+						break;
+					default:
+						params = adhan.CalculationMethod.MuslimWorldLeague();
+				}
 
 				const date = new Date();
 				const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
