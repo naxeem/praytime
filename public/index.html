@@ -547,8 +547,10 @@
 				var next = prayerTimes.nextPrayer();
 				var nextPrayerTime = prayerTimes.timeForPrayer(next);
 
-				document.getElementById("nextPrayerTime").innerHTML =
-					dayjs(nextPrayerTime).format("HH:mm");
+				if (nextPrayerTime) {
+					document.getElementById("nextPrayerTime").innerHTML =
+						dayjs(nextPrayerTime).format("HH:mm");
+				}
 
 				let html = "";
 				for (const [key, name] of Object.entries(timeNames)) {
@@ -634,10 +636,17 @@
 				const hours = Math.floor(duration.asHours());
 				const minutes = duration.minutes();
 
+				let outText = "";
+
+				if (hours) {
+					outText += `${hours} hr`;
+				}
+				if (minutes) {
+					outText += ` ${minutes} min`;
+				}
+
 				// Display the countdown
-				document.getElementById(
-					"nextPrayerTimeTill"
-				).innerHTML = `${hours} hr ${minutes} min`;
+				document.getElementById("nextPrayerTimeTill").innerHTML = outText;
 			}
 		</script>
 	</body>
