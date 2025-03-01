@@ -1,4 +1,4 @@
-const version = "0.9-settings";
+const version = "0.9-adjst";
 const cacheName = `praytime-${version}`;
 self.addEventListener("install", (e) => {
 	e.waitUntil(

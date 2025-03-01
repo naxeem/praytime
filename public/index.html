@@ -62,7 +62,7 @@
 						</button>
 					</div>
 				</div>
-				<div class="max-w-md mx-auto text-center pb-5 pt-10">
+				<div class="max-w-md mx-auto text-center pb-5 pt-5">
 					<span
 						class="block w-full p-4 max-w-xl mx-auto text-center text-red-500 text-sm"
 						id="errorMessage"
@@ -357,12 +357,6 @@
 		<script>
 			dayjs.extend(dayjs_plugin_duration);
 
-			const hijriDate = new Intl.DateTimeFormat("ar-MV-u-ca-islamic-umalqura", {
-				day: "numeric",
-				month: "long",
-				year: "numeric",
-			});
-
 			document.getElementById("currentDate").innerHTML =
 				dayjs().format("ddd, DD MMM YYYY");
 
@@ -383,7 +377,7 @@
 				];
 
 				const currentDate = new Date();
-				const hijriDate = new Intl.DateTimeFormat("en-MV-u-ca-islamic", {
+				const hijriDate = new Intl.DateTimeFormat("ar-MV-u-ca-islamic", {
 					day: "numeric",
 					month: "long",
 					year: "numeric",
