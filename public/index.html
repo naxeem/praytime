@@ -40,7 +40,7 @@
 		<link rel="stylesheet" href="./style.css" />
 		<title>Praytime - Prayer times</title>
 	</head>
-	<body class="bg-gradient-to-b from-blue-950 to-gray-900 h-screen">
+	<body class="bg-gradient-to-b from-blue-950 to-gray-900 min-h-screen">
 		<main id="app" class="font-montserrat font-normal">
 			<header>
 				<div class="p-5">
@@ -273,6 +273,83 @@
 							<span class="text-sm text-white/80">No locations saved yet!</span>
 						</div>
 					</div>
+
+					<div>
+						<h3 class="text-lg font-medium mb-2">
+							Prayer Time Adjustments (minutes)
+						</h3>
+						<div class="grid grid-cols-2 gap-4">
+							<div>
+								<label class="block text-sm mb-1" for="fajrAdjustment"
+									>Fajr</label
+								>
+								<input
+									class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+									type="number"
+									id="fajrAdjustment"
+									placeholder="0"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm mb-1" for="dhuhrAdjustment"
+									>Dhuhr</label
+								>
+								<input
+									class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+									type="number"
+									id="dhuhrAdjustment"
+									placeholder="0"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm mb-1" for="asrAdjustment"
+									>Asr</label
+								>
+								<input
+									class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+									type="number"
+									id="asrAdjustment"
+									placeholder="0"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm mb-1" for="maghribAdjustment"
+									>Maghrib</label
+								>
+								<input
+									class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+									type="number"
+									id="maghribAdjustment"
+									placeholder="0"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm mb-1" for="ishaAdjustment"
+									>Isha</label
+								>
+								<input
+									class="w-full appearance-none focus:outline focus:outline-2 focus:outline-orange-500 rounded-xl border-none outline-none bg-white/20 p-3 placeholder:text-white/50 text-sm text-current"
+									type="number"
+									id="ishaAdjustment"
+									placeholder="0"
+								/>
+							</div>
+							<div class="flex items-end space-x-2">
+								<button
+									onclick="saveAdjustments()"
+									class="appearance-none rounded-xl bg-blue-700 text-sm py-3 px-5"
+								>
+									Save Adjustments
+								</button>
+								<button
+									onclick="resetAdjustments()"
+									class="appearance-none rounded-xl bg-blue-950 text-sm py-3 px-5"
+								>
+									Reset
+								</button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>
@@ -337,9 +414,32 @@
 					currentCalculationMethod;
 			}, 100);
 
+			function loadAdjustments() {
+				document.getElementById("fajrAdjustment").value =
+					currentAdjustments.fajr;
+				document.getElementById("dhuhrAdjustment").value =
+					currentAdjustments.dhuhr;
+				document.getElementById("asrAdjustment").value = currentAdjustments.asr;
+				document.getElementById("maghribAdjustment").value =
+					currentAdjustments.maghrib;
+				document.getElementById("ishaAdjustment").value =
+					currentAdjustments.isha;
+			}
+
+			function resetAdjustments() {
+				document.getElementById("fajrAdjustment").value = 0;
+				document.getElementById("dhuhrAdjustment").value = 0;
+				document.getElementById("asrAdjustment").value = 0;
+				document.getElementById("maghribAdjustment").value = 0;
+				document.getElementById("ishaAdjustment").value = 0;
+
+				saveAdjustments(); // Save the reset values
+			}
+
 			function openSettings() {
 				document.getElementById("settingsModal").style.display = "block";
 				refreshSavedLocations();
+				loadAdjustments();
 			}
 
 			function closeSettings() {
@@ -467,6 +567,50 @@
 				});
 			}
 
+			// Add this to initialize the adjustments from localStorage
+			let defaultAdjustments = {
+				fajr: 0,
+				dhuhr: 0,
+				asr: 0,
+				maghrib: 0,
+				isha: 0,
+			};
+
+			// Initialize adjustments from localStorage or use defaults
+			let currentAdjustments =
+				JSON.parse(localStorage.getItem("prayerAdjustments")) ||
+				defaultAdjustments;
+
+			// Add this function to save the adjustments
+			function saveAdjustments() {
+				const fajrAdj =
+					parseInt(document.getElementById("fajrAdjustment").value) || 0;
+				const dhuhrAdj =
+					parseInt(document.getElementById("dhuhrAdjustment").value) || 0;
+				const asrAdj =
+					parseInt(document.getElementById("asrAdjustment").value) || 0;
+				const maghribAdj =
+					parseInt(document.getElementById("maghribAdjustment").value) || 0;
+				const ishaAdj =
+					parseInt(document.getElementById("ishaAdjustment").value) || 0;
+
+				currentAdjustments = {
+					fajr: fajrAdj,
+					dhuhr: dhuhrAdj,
+					asr: asrAdj,
+					maghrib: maghribAdj,
+					isha: ishaAdj,
+				};
+
+				localStorage.setItem(
+					"prayerAdjustments",
+					JSON.stringify(currentAdjustments)
+				);
+
+				closeSettings();
+				updatePrayerTimes();
+			}
+
 			function updatePrayerTimes() {
 				const latitude = parseFloat(document.getElementById("latitude").value);
 				const longitude = parseFloat(
@@ -528,8 +672,23 @@
 						params = adhan.CalculationMethod.MuslimWorldLeague();
 				}
 
+				params.adjustments = currentAdjustments;
+
 				const date = new Date();
 				const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
+
+				const sunnahTimes = new adhan.SunnahTimes(prayerTimes);
+
+				const sunnahTimesArr = [
+					{
+						name: "Middle of night",
+						time: dayjs(sunnahTimes.middleOfTheNight).format("hh:mm A"),
+					},
+					{
+						name: "Last 3rd",
+						time: dayjs(sunnahTimes.lastThirdOfTheNight).format("hh:mm A"),
+					},
+				];
 
 				const timeNames = {
 					fajr: "Fajr",
@@ -565,8 +724,8 @@
 								<span class="shrink-0">`;
 						if (name === "Maghrib" || name === "Isha") {
 							html += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 fill-blue-500">
-<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
-</svg>`;
+										<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
+										</svg>`;
 						} else {
 							html += `<svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 fill-yellow-500">
 								<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
@@ -598,6 +757,25 @@
 
 						html += `</div>`;
 					}
+					html += `</div>`;
+				}
+
+				for (const sunnahTime of sunnahTimesArr) {
+					html += `<div>`;
+					html += `<div class="flex items-center space-x-2 text-white/80">
+								<span class="shrink-0">`;
+					html += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 fill-blue-500">
+										<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
+										</svg>`;
+
+					html += `			</span>
+								<h3 class="grow text-xl font-medium">${sunnahTime.name}</h3>
+								<span class="shrink-0 text-lg">${sunnahTime.time}</span>
+							</div>`;
+
+					html += `<div class="flex items-center px-1 pt-1">`;
+
+					html += `</div>`;
 					html += `</div>`;
 				}
 
