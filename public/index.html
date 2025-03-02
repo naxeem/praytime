@@ -43,10 +43,10 @@
 	<body class="bg-gradient-to-b from-blue-950 to-gray-900 min-h-screen">
 		<main id="app" class="font-montserrat font-normal">
 			<header>
-				<div class="p-5">
+				<div class="p-5 pb-0">
 					<div class="max-w-md mx-auto flex items-center justify-between">
 						<h1 class="text-slate-200/90 grow text-base font-medium">
-							PrayTime
+							🕌 PrayTime
 						</h1>
 						<button onclick="openSettings()" class="text-slate-200/90">
 							<svg
@@ -62,15 +62,11 @@
 						</button>
 					</div>
 				</div>
-				<div class="max-w-md mx-auto text-center pb-5 pt-5">
+				<div class="max-w-md mx-auto text-left pb-5">
+					<span class="" id="errorMessage"></span>
+					<span class="text-sm text-white/80 block" id="currentDate"></span>
 					<span
-						class="block w-full p-4 max-w-xl mx-auto text-center text-red-500 text-sm"
-						id="errorMessage"
-					></span>
-					<span class="text-4xl text-white/80 block" id="nextPrayerTime"></span>
-					<span class="text-sm text-white/60 block" id="currentDate"></span>
-					<span
-						class="text-xs text-orange-500 pt-1 block"
+						class="text-xs text-white/60 block"
 						id="currentLocationLabel"
 					></span>
 				</div>
@@ -337,7 +333,7 @@
 									placeholder="0"
 								/>
 							</div>
-							<div class="flex items-end space-x-2">
+							<div class="col-span-2 flex items-end space-x-2">
 								<button
 									onclick="saveAdjustments()"
 									class="appearance-none rounded-xl bg-blue-700 text-sm py-3 px-5"
@@ -380,13 +376,28 @@
 				];
 
 				const currentDate = new Date();
-				const hijriDate = new Intl.DateTimeFormat("ar-MV-u-ca-islamic", {
+
+				// Get numeric values for day, month, and year
+				const day = new Intl.DateTimeFormat("en-u-ca-islamic", {
 					day: "numeric",
-					month: "long",
+				}).format(currentDate);
+
+				// Month is 1-based in the formatter but 0-based in our array
+				const monthIndex =
+					parseInt(
+						new Intl.DateTimeFormat("en-u-ca-islamic", {
+							month: "numeric",
+						}).format(currentDate)
+					) - 1;
+
+				const year = new Intl.DateTimeFormat("en-u-ca-islamic", {
 					year: "numeric",
 				}).format(currentDate);
 
-				document.getElementById("hijriDate").innerHTML = hijriDate;
+				// Format using your custom month names
+				const formattedDate = `${day} ${months[monthIndex]} ${year}`;
+
+				document.getElementById("hijriDate").innerHTML = formattedDate;
 			}
 
 			getHijriDate();
@@ -400,8 +411,18 @@
 
 			setTimeout(() => {
 				if (!currentLocationId) {
-					document.getElementById("errorMessage").innerHTML =
-						"Error: Please set a location from settings!";
+					const errorEl = document.getElementById("errorMessage");
+					errorEl.innerHTML = "Error: Please set a location from settings!";
+					errorEl.classList.add(
+						"block",
+						"w-full",
+						"p-4",
+						"max-w-xl",
+						"mx-auto",
+						"text-center",
+						"text-red-500",
+						"text-sm"
+					);
 				}
 				if (!currentCalculationMethod) {
 					localStorage.setItem("currentCalculationMethod", "MuslimWorldLeague");
@@ -705,11 +726,6 @@
 				var next = prayerTimes.nextPrayer();
 				var nextPrayerTime = prayerTimes.timeForPrayer(next);
 
-				if (nextPrayerTime) {
-					document.getElementById("nextPrayerTime").innerHTML =
-						dayjs(nextPrayerTime).format("HH:mm");
-				}
-
 				let html = "";
 				for (const [key, name] of Object.entries(timeNames)) {
 					html += `<div>`;
@@ -778,7 +794,7 @@
 				).format("hh:mm");
 
 				updateCountdown(nextPrayerTime);
-				setInterval(updateCountdown(nextPrayerTime), 60000);
+				setInterval(updateCountdown(nextPrayerTime), 6000);
 
 				document.getElementById("nextPrayerName").innerHTML = `${next} in`;
 			}
